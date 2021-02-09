@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="jibo">
+
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+    <material name="red">
+        <color rgba="0.8 0 0 1"/>
+    </material>
+    <material name="green">
+        <color rgba="0 0.8 0 1"/>
+    </material>
+    
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        </plugin>
+    </gazebo>
+
+
+    <link name="base_link">
+        <inertial>
+            <origin xyz="0 0 0.0" rpy="0 0 0"/>
+            <mass value="2" />
+            <inertia ixx="0.0116666666667" ixy="0.0" ixz="0.0" iyy="0.0116666666667" iyz="0.0" izz="0.0225"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.15" length="0.05"/>
+            </geometry>
+        </collision>
+		<visual>
+		    <origin xyz="0 0 0.0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_base_v3.dae"/>
+			</geometry>
+            <material name="blue"/>
+		</visual>
+	</link>
+
+    <link name="waist_link">
+ 	    <inertial>
+            <origin xyz="0 0 0.00" rpy="0 0 0"/>
+            <mass value="2" />
+            <inertia ixx="0.0136166666667" ixy="0.0" ixz="0.0" iyy="0.0136166666667" iyz="0.0" izz="0.0256"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0.00" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.16" length="0.07"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0.0"/>
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_waist_v3.dae"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+	</link>
+
+    <gazebo reference="waist_link">
+        <kp>1000.0</kp>
+        <kd>1000.0</kd>
+        <mu1>10.0</mu1>
+        <mu2>10.0</mu2>
+    </gazebo>
+
+
+    <joint name="base_waist_joint" type="revolute">
+    	<parent link="base_link"/>
+    	<child link="waist_link"/>
+        <origin xyz="0.0 0.0 0.00" rpy="0.0 0.0 0.0"/>
+        <limit effort="1.0" lower="-3.1416" upper="3.1416" velocity="0.5"/>
+        <axis xyz="0 0 1"/>
+	</joint>
+
+    <transmission name="tran1">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="base_waist_joint">
+            <hardwareInterface>EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="motor1">
+            <hardwareInterface>EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+
+    <link name="body_link">
+ 	    <inertial>
+            <origin xyz="0 0 0.0" rpy="0 0 0"/>
+            <mass value="3" />
+            <inertia ixx="0.025275" ixy="0.0" ixz="0.0" iyy="0.025275" iyz="0.0" izz="0.04335"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0.05" rpy="0 0 0"/>
+            <geometry>
+                <cylinder length="0.17" radius="0.12"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0.05"/>
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_body_v3.dae"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+	</link>
+
+    <joint name="waist_body_joint" type="fixed">
+    	<parent link="waist_link"/>
+    	<child link="body_link"/>
+        <origin xyz="0.0 -0.0095 0.0049" rpy="-0.261799 0.0 0.0"/>
+	</joint>
+
+    <link name="head_link">
+ 	    <inertial>
+            <origin xyz="0 0 0.0" rpy="0 0 0"/>
+            <mass value="3" />
+            <inertia ixx="0.025275" ixy="0.0" ixz="0.0" iyy="0.025275" iyz="0.0" izz="0.04335"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0.05" rpy="0 0 0"/>
+            <geometry>
+                <cylinder length="0.17" radius="0.12"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0.05"/>
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_head_v5.dae"/>
+            </geometry>
+            <material name="green"/>
+        </visual>
+	</link>
+
+    <joint name="head_body_joint" type="continuous">
+    	<parent link="body_link"/>
+    	<child link="head_link"/>
+        <origin xyz="0.0 0.0 0.261799" rpy="-0.015708 0.0 0"/>
+        <limit effort="1.0" velocity="0.5"/>
+        <axis xyz="0 0 1"/>
+	</joint>
+
+</robot>
